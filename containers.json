@@ -1,0 +1,98 @@
+[
+    {
+        "logConfiguration": {
+            "logDriver": "awsfirelens",
+            "options": {
+              "dd_message_key": "log",
+              "apikey": "df82c7ea19f0b29910d20559f3bde1fd",
+              "provider": "ecs",
+              "dd_service": "firelens-test",
+              "dd_source": "httpd",
+              "Host": "http-intake.logs.us5.datadoghq.com",
+              "TLS": "off",
+              "dd_tags": "project:fluent-bit",
+              "Name": "datadog"
+            }
+          },
+        "name": "node-server",
+        "image": "072056452537.dkr.ecr.us-east-1.amazonaws.com/node-server",
+        "portMappings": [
+            {
+                "containerPort": 5050,
+                "hostPort": 5050,
+                "protocol": "tcp"
+            }
+        ],
+        "essential": true,
+        "dockerLabels": {
+            "com.datadoghq.ad.instances": "[{\"host\": \"%%host%%\", \"port\": 5050}]",
+            "com.datadoghq.ad.check_names": "[\"node-server\"]",
+            "com.datadoghq.ad.init_configs": "[{}]"
+        }
+    },
+     {
+        "name": "datadog-agent",
+        "image": "072056452537.dkr.ecr.us-east-1.amazonaws.com/datadog",
+        "essential": true,
+        "secrets": [
+            {
+                "valueFrom": "arn:aws:secretsmanager:us-east-1:072056452537:secret:dd_api_key-Tj3jCD",
+                "name": "DD_API_KEY"
+            }
+        ],
+        "environment": [
+
+            {
+                "name": "ECS_FARGATE",
+                "value": "true"
+            },
+            {
+                "name": "DD_LOGS_ENABLED",
+                "value": "true"
+            },
+            {
+                "name": "DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL",
+                "value": "true"
+            },
+            {
+                "name": " DD_HOSTNAME",
+                "value": "{{ host }}"
+            },
+            {
+                "name": "DD_PROCESS_AGENT_ENABLED",
+                "value": "true"
+            },
+            {
+                "name": "DD_DOGSTATSD_NON_LOCAL_TRAFFIC",
+                "value": "false"
+            },
+            {
+                "name":" DD_APM_ENABLED",
+                "value":"false"
+            },
+            {
+                "name":"DD_SITE",
+                "value":"us5.datadoghq.com"
+            },
+            {
+                "name":"DD_CONTAINER_EXCLUDE",
+                "value":"name:datadog-agent"
+            }
+        ]
+   },
+   {
+    "essential": true,
+    "image": "906394416424.dkr.ecr.us-west-2.amazonaws.com/aws-for-fluent-bit:stable",
+    "name": "log_router",
+    "firelensConfiguration": {
+      "type": "fluentbit",
+      "options": {
+        "config-file-type": "file",
+        "config-file-value": "/fluent-bit/configs/parse-json.conf",
+        "enable-ecs-log-metadata": "true"
+      }
+    },
+    "memoryReservation": 50
+}
+]
+
