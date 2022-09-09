@@ -4,7 +4,7 @@
             "logDriver": "awsfirelens",
             "options": {
               "dd_message_key": "log",
-              "apikey": "df82c7ea19f0b29910d20559f3bde1fd",
+              "apikey": "<api_key>",
               "provider": "ecs",
               "dd_service": "firelens-test",
               "dd_source": "httpd",
