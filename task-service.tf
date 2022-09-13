@@ -10,16 +10,16 @@ resource "aws_ecs_service" "main" {
   
   network_configuration {
     security_groups  = [aws_security_group.ecs_tasks.id]
-    subnets          = [for subnet in aws_subnet.public : subnet.id]
-    assign_public_ip = true
+    subnets          = [for subnet in aws_subnet.private : subnet.id]
+    assign_public_ip = false
   }
 
-#   load_balancer {
-#     target_group_arn = aws_alb_target_group.main.arn
-#     container_name   = "node-server"
-#     container_port   = var.container_port
-#   }
-#   depends_on = [aws_alb_target_group.main]
+  load_balancer {
+    target_group_arn = aws_alb_target_group.main.arn
+    container_name   = "node-server"
+    container_port   = var.container_port
+  }
+  depends_on = [aws_alb_target_group.main]
 
   lifecycle {
     ignore_changes = [task_definition, desired_count]

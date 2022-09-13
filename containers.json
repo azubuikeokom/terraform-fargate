@@ -2,12 +2,18 @@
     {
         "logConfiguration": {
             "logDriver": "awsfirelens",
+            "SecretOptions": [
+                    {
+                        "valueFrom": "arn:aws:secretsmanager:us-east-1:072056452537:secret:dd_api_key-Tj3jCD",
+                        "name": "apikey"
+                    }
+            ]
+,
             "options": {
               "dd_message_key": "log",
-              "apikey": "<api_key>",
               "provider": "ecs",
               "dd_service": "firelens-test",
-              "dd_source": "httpd",
+              "dd_source": "node-server",
               "Host": "http-intake.logs.us5.datadoghq.com",
               "TLS": "off",
               "dd_tags": "project:fluent-bit",
@@ -64,11 +70,11 @@
             },
             {
                 "name": "DD_DOGSTATSD_NON_LOCAL_TRAFFIC",
-                "value": "false"
+                "value": "true"
             },
             {
                 "name":" DD_APM_ENABLED",
-                "value":"false"
+                "value":"true"
             },
             {
                 "name":"DD_SITE",
